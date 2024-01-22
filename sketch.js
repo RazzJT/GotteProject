@@ -4,8 +4,8 @@ function setup() {
 }
 
 function RandomCirleShit() {
-  x = random(10,100);
-  y = random(10,100);
+  x = random(100,400);
+  y = random(100,400);
   CreateCircle(x,y);
   console.log(x)
 }
