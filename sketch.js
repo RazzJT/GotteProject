@@ -14,3 +14,4 @@ function CreateCircle(x,y) {
   fill("red");
   circle(x,y,100);
 }
+console.log("Jakob kan du se det her")
