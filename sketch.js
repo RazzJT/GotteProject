@@ -120,22 +120,21 @@ class Invader {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.r = 20; // Size for drawing and collision detection
-    this.stepSize = 20; // How far to move in each step
+    this.width = 20; // Width of the invader
+    this.height = 20; // Height of the invader
   }
 
   show() {
     fill(255, 0, 200);
-    rect(this.x - this.r / 2, this.y - this.r / 2, this.r, this.r); // Draw as square
+    rect(this.x, this.y, this.width, this.height); // Draw invader as a rectangle
   }
 
   move(direction) {
-    // Adjusted to move in steps based on the direction and stepSize
-    this.x += direction * this.stepSize;
+    this.x += direction * this.width; // Move in steps based on its width
   }
 
   shiftDown() {
-    this.y += this.r; // Move down by its own size
+    this.y += this.height; // Move down by its own height
   }
 }
 
@@ -143,22 +142,21 @@ class Bullet {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.r = 4; // Assuming a radius for the bullet for hitbox calculation
+    this.r = 4; // Assuming a radius for the bullet
   }
 
   show() {
     fill(50, 0, 200);
-    ellipse(this.x, this.y, this.r * 2, this.r * 2); // Draw bullet as circle
+    ellipse(this.x, this.y, this.r * 2, this.r * 2); // Draw bullet as a circle
   }
 
   move() {
-    this.y -= 10;
+    this.y -= 5; // Bullet speed
   }
 
   hits(invader) {
-    let hitboxExtension = 5; // Extend the hitbox by 5 pixels on all sides
-    let withinXBounds = this.x > invader.x - invader.r / 2 - hitboxExtension && this.x < invader.x + invader.r / 2 + hitboxExtension;
-    let withinYBounds = this.y > invader.y - invader.r / 2 - hitboxExtension && this.y < invader.y + invader.r / 2 + hitboxExtension;
-    return withinXBounds && withinYBounds;
+    let hit = this.x > invader.x && this.x < invader.x + invader.width &&
+              this.y > invader.y && this.y < invader.y + invader.height;
+    return hit;
   }
 }
