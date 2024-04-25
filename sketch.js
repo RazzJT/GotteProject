@@ -4,7 +4,8 @@ let invaders = [];
 let bullets = [];
 let invaderDirection = 1;
 let score = 0;
-
+let highscore = 0;
+let gameOver = false
 const shootCooldown = 300;
 let lastShootTime = 0;
 
@@ -19,17 +20,26 @@ function setup() {
 }
 
 function draw() {
+    if (!gameOver) {
+    runGame();
+  } else {
+    displayGameOverScreen();
+  }
+}
+
+function runGame() {  
   background(0);
   player.show();
   player.move();
 
   let edge = false;
 
+
   for (let bullet of bullets) {
     bullet.show();
     bullet.move();
 
-    // More efficient collision check and bullet removal
+
     for (let i = invaders.length - 1; i >= 0; i--) {
       if (bullet.hits(invaders[i])) {
         score += 10;
@@ -39,12 +49,19 @@ function draw() {
     }
   }
 
+
   for (let invader of invaders) {
     invader.show();
     invader.move(invaderDirection);
     if (invader.x > width - invader.r || invader.x < invader.r) {
       edge = true;
     }
+  }
+
+
+  if (invader.y + invader.r >= height - 30) { // `30` can be adjusted based on where you want the threshold
+    gameOver = true;
+    highScore = max(highScore, score);
   }
 
   if (edge) {
@@ -54,6 +71,7 @@ function draw() {
     }
   }
   
+
   // Viser scoren
   fill(255);
   textSize(20);
@@ -62,19 +80,43 @@ function draw() {
 }
 
 
+function displayGameOverScreen() {
+  background(50);
+  textSize(40);
+  fill(255);
+  textAlign(CENTER);
+  text("Game Over", width / 2, height / 2);
+  text("Score: " + score, width / 2, height / 2 + 50);
+  text("High Score: " + highScore, width / 2, height / 2 + 100);
+}
+
 function keyPressed() {
-  if (keyCode === RIGHT_ARROW) {
-    player.setDirection(1);
-  } else if (keyCode === LEFT_ARROW) {
-    player.setDirection(-1);
-  } else if (keyCode === 32) { // Mellemrumstasten for at skyde
-    // Tjekker om der er gået tilstrækkelig lang tid siden sidste skud
-    if (millis() - lastShootTime > shootCooldown) {
-      bullets.push(new Bullet(player.x, height - 20));
-      lastShootTime = millis(); // Opdaterer sidste skydetidspunkt
+  if (!gameOver) {
+    if (keyCode === RIGHT_ARROW) {
+      player.setDirection(1);
+    } else if (keyCode === LEFT_ARROW) {
+      player.setDirection(-1);
+    } else if (keyCode === 32) { // Spacebar to shoot
+      if (millis() - lastShootTime > shootCooldown) {
+        bullets.push(new Bullet(player.x, height - 20));
+        lastShootTime = millis();
+      }
     }
+  } else if (keyCode === 13) { // Restart game
+    restartGame();
   }
 }
+
+function restartGame() {
+  // Reset all variables
+  score = 0;
+  invaders = [];
+  bullets = [];
+  gameOver = false;
+  setup(); // Re-initialize the game setup
+}
+
+
 
 function keyReleased() {
   if (keyCode === RIGHT_ARROW || keyCode === LEFT_ARROW) {
@@ -87,7 +129,7 @@ class Player {
     this.x = width / 2;
     this.xdir = 0;
     this.velocity = 0; 
-    this.speed = 1; 
+    this.speed = 0.7; 
     this.r = 10;
   }
 
@@ -126,11 +168,11 @@ class Invader {
   }
 
   move(direction) {
-    this.x += direction * 1; // Bevægelse baseret på retning
+    this.x += direction * 3; // Bevægelse baseret på retning
   }
 
   shiftDown() {
-    this.y += 20; // Bevægelse nedad
+    this.y += 40; // Bevægelse nedad
   }
 }
 
