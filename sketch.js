@@ -4,6 +4,7 @@ let invaders = [];
 let bullets = [];
 let invaderDirection = 1;
 let score = 0;
+var gameState = "start";
 
 const shootCooldown = 300;
 let lastShootTime = 0;
@@ -18,7 +19,50 @@ function setup() {
   }
 }
 
+function mouseClicked() {
+  if (gameState === "start") {
+
+    const buttonX = 500;
+    const buttonY = 250;
+    const buttonWidth = 200;
+    const buttonHeight = 50;
+
+    if (mouseX > buttonX - buttonWidth / 2 && mouseX < buttonX + buttonWidth / 2 &&
+        mouseY > buttonY - buttonHeight / 2 && mouseY < buttonY + buttonHeight / 2) {
+      gameState = "playing";
+    }
+  }
+}
+
+
 function draw() {
+  if (gameState == "start") {
+    // start parat start klart
+    background(0);
+    fill(255);
+    textSize(48);
+    textAlign(CENTER, CENTER);
+    text("Rum immigranter", width / 2, height / 3);
+
+
+    fill(255, 0, 0);
+    rectMode(CENTER);
+    const buttonX = width / 2;
+    const buttonY = height / 2;
+    const buttonWidth = 200;
+    const buttonHeight = 50;
+    rect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+
+    fill(255);
+    textSize(32);
+    text("Play", buttonX, buttonY);
+  }
+
+
+ 
+  else if (gameState == "playing") {
+     // Spillespil med spil på toppen
   background(0);
   player.show();
   player.move();
@@ -59,6 +103,15 @@ function draw() {
   textSize(20);
   textAlign(RIGHT);
   text("Score: " + score, width - 20, 30);
+  }
+ 
+
+
+  else{
+  // game over spærm 
+  }
+
+
 }
 
 
