@@ -56,12 +56,10 @@ function runGame() {
     if (invader.x > width - invader.r || invader.x < invader.r) {
       edge = true;
     }
-  }
-
-
-  if (invader.y + invader.r >= height - 30) { // `30` can be adjusted based on where you want the threshold
-    gameOver = true;
-    highScore = max(highScore, score);
+    if (invader.y + invader.r >= height - 30) { // `30` can be adjusted based on where you want the threshold
+      gameOver = true;
+      highScore = max(highScore, score);
+    }
   }
 
   if (edge) {
