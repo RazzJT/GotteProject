@@ -4,6 +4,7 @@ let invaders = [];
 let bullets = [];
 let invaderDirection = 1;
 let score = 0;
+let highScore = 0;
 var gameState = "start";
 
 const shootCooldown = 300;
@@ -18,6 +19,18 @@ function setup() {
     }
   }
 }
+
+function draw() {
+  if (gameState == "start") {
+    startScreen(); 
+  } else if (gameState == "playing") {
+    playingScreen();
+  } else if (gameState == "gameover") {
+    console.log("DEN KØRTE");
+    gameOverScreen();
+  }
+}
+
 
 function mouseClicked() {
   if (gameState === "start") {
@@ -34,84 +47,87 @@ function mouseClicked() {
   }
 }
 
-
-function draw() {
-  if (gameState == "start") {
-    // start parat start klart
-    background(0);
-    fill(255);
-    textSize(48);
-    textAlign(CENTER, CENTER);
-    text("Rum immigranter", width / 2, height / 3);
+function startScreen() {
+   // start parat start klart
+   background(0);
+   fill(255);
+   textSize(48);
+   textAlign(CENTER, CENTER);
+   text("Rum immigranter", width / 2, height / 3);
 
 
-    fill(255, 0, 0);
-    rectMode(CENTER);
-    const buttonX = width / 2;
-    const buttonY = height / 2;
-    const buttonWidth = 200;
-    const buttonHeight = 50;
-    rect(buttonX, buttonY, buttonWidth, buttonHeight);
+   fill(255, 0, 0);
+   rectMode(CENTER);
+   const buttonX = width / 2;
+   const buttonY = height / 2;
+   const buttonWidth = 200;
+   const buttonHeight = 50;
+   rect(buttonX, buttonY, buttonWidth, buttonHeight);
 
 
-    fill(255);
-    textSize(32);
-    text("Play", buttonX, buttonY);
-  }
+   fill(255);
+   textSize(32);
+   text("Play", buttonX, buttonY);
+}
 
-
- 
-  else if (gameState == "playing") {
-     // Spillespil med spil på toppen
-  background(0);
-  player.show();
-  player.move();
-
-  let edge = false;
-
-  for (let bullet of bullets) {
-    bullet.show();
-    bullet.move();
-
-    // More efficient collision check and bullet removal
-    for (let i = invaders.length - 1; i >= 0; i--) {
-      if (bullet.hits(invaders[i])) {
-        score += 10;
-        invaders.splice(i, 1);
-        bullets.splice(bullets.indexOf(bullet), 1);
-      }
-    }
-  }
-
-  for (let invader of invaders) {
-    invader.show();
-    invader.move(invaderDirection);
-    if (invader.x > width - invader.r || invader.x < invader.r) {
-      edge = true;
-    }
-  }
-
-  if (edge) {
-    invaderDirection *= -1;
-    for (let invader of invaders) {
-      invader.shiftDown();
-    }
-  }
-  
-  // Viser scoren
+function gameOverScreen() {
+  background(50);
+  textSize(40);
   fill(255);
-  textSize(20);
-  textAlign(RIGHT);
-  text("Score: " + score, width - 20, 30);
-  }
+  textAlign(CENTER);
+  text("Game Over", width / 2, height / 2);
+  text("Score: " + score, width / 2, height / 2 + 50);
+  text("High Score: " + highScore, width / 2, height / 2 + 100);
+}
+
+function playingScreen() {
+ // Spillespil med spil på toppen
+ background(0);
+ player.show();
+ player.move();
+
+ let edge = false;
+
+ for (let bullet of bullets) {
+   bullet.show();
+   bullet.move();
+
+   // More efficient collision check and bullet removal
+   for (let i = invaders.length - 1; i >= 0; i--) {
+     if (bullet.hits(invaders[i])) {
+       score += 10;
+       invaders.splice(i, 1);
+       bullets.splice(bullets.indexOf(bullet), 1);
+     }
+   }
+ }
+
+ for (let invader of invaders) {
+   invader.show();
+   invader.move(invaderDirection);
+   if (invader.x > width - invader.r || invader.x < invader.r) {
+     edge = true;
+   }
+   if (invader.y + invader.r >= height - 30 ) {
+    console.log("gameover")  
+    gameState = "gameover"
+    highScore = max(highScore, score);
+    break;  
+    }
+  } 
+
+ if (edge) {
+   invaderDirection *= -1;
+   for (let invader of invaders) {
+     invader.shiftDown();
+   }
+ }
  
-
-
-  else{
-  // game over spærm 
-  }
-
-
+ // Viser scoren
+ fill(255);
+ textSize(20);
+ textAlign(RIGHT);
+ text("Score: " + score, width - 20, 30);
 }
 
 
@@ -179,7 +195,7 @@ class Invader {
   }
 
   move(direction) {
-    this.x += direction * 1; // Bevægelse baseret på retning
+    this.x += direction * 3; // Bevægelse baseret på retning
   }
 
   shiftDown() {
