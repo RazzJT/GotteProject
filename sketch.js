@@ -87,7 +87,7 @@ class Player {
     this.x = width / 2;
     this.xdir = 0;
     this.velocity = 0; 
-    this.speed = 1; 
+    this.speed = 0.5; 
     this.r = 10;
   }
 
