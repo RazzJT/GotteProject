@@ -1,21 +1,19 @@
+// Globale variabler
 let player;
 let invaders = [];
 let bullets = [];
 let invaderDirection = 1;
-let lastMoveTime = 0; // Track the last time the invaders moved
-const moveInterval = 1000; // Move every 1000 milliseconds (1 second)
+let score = 0;
 
-// Shooting cooldown in milliseconds
-const shootCooldown = 500;
-// Variable to track the last shooting time
+const shootCooldown = 300;
 let lastShootTime = 0;
 
 function setup() {
   createCanvas(1000, 500);
   player = new Player();
   for (let i = 0; i < 10; i++) {
-    for (let j = 0; j < 5; j++) { // Create multiple rows of invaders
-      invaders.push(new Invader(i * 50 + 50, j * 50 + 20));
+    for (let j = 0; j < 5; j++) {
+      invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
     }
   }
 }
@@ -25,53 +23,43 @@ function draw() {
   player.show();
   player.move();
 
-  // Handle bullet movement and drawing
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    bullets[i].show();
-    bullets[i].move();
-    // Remove bullets that go off the screen
-    if (bullets[i].y < 0) {
-      bullets.splice(i, 1);
-    } else {
-      // Check for bullet hitting any invader
-      for (let j = invaders.length - 1; j >= 0; j--) {
-        if (bullets[i] && bullets[i].hits(invaders[j])) {
-          // Remove the hit invader and the bullet
-          invaders.splice(j, 1);
-          bullets.splice(i, 1);
-          break; // Exit the inner loop if a hit is detected
-        }
+  let edge = false;
+
+  for (let bullet of bullets) {
+    bullet.show();
+    bullet.move();
+
+    // More efficient collision check and bullet removal
+    for (let i = invaders.length - 1; i >= 0; i--) {
+      if (bullet.hits(invaders[i])) {
+        score += 10;
+        invaders.splice(i, 1);
+        bullets.splice(bullets.indexOf(bullet), 1);
       }
     }
   }
 
-  let currentTime = millis();
-  if (currentTime - lastMoveTime > moveInterval) {
-    let edgeDetected = false;
-    // Move each invader and check for edge detection
-    for (let invader of invaders) {
-      invader.move(invaderDirection);
-      if (invader.x > width - invader.r || invader.x < invader.r) {
-        edgeDetected = true;
-      }
-    }
-
-    if (edgeDetected) {
-      invaderDirection *= -1; // Change direction
-      for (let invader of invaders) {
-        invader.shiftDown(); // Move all invaders down
-      }
-    }
-
-    lastMoveTime = currentTime; // Update the time of the last move
-  }
-
-  // Draw each invader
   for (let invader of invaders) {
     invader.show();
+    invader.move(invaderDirection);
+    if (invader.x > width - invader.r || invader.x < invader.r) {
+      edge = true;
+    }
   }
-}
 
+  if (edge) {
+    invaderDirection *= -1;
+    for (let invader of invaders) {
+      invader.shiftDown();
+    }
+  }
+  
+  // Viser scoren
+  fill(255);
+  textSize(20);
+  textAlign(RIGHT);
+  text("Score: " + score, width - 20, 30);
+}
 
 
 function keyPressed() {
@@ -79,11 +67,11 @@ function keyPressed() {
     player.setDirection(1);
   } else if (keyCode === LEFT_ARROW) {
     player.setDirection(-1);
-  } else if (keyCode === 32) { // Spacebar to shoot
-    // Check if enough time has passed since the last shot
+  } else if (keyCode === 32) { // Mellemrumstasten for at skyde
+    // Tjekker om der er gået tilstrækkelig lang tid siden sidste skud
     if (millis() - lastShootTime > shootCooldown) {
       bullets.push(new Bullet(player.x, height - 20));
-      lastShootTime = millis(); // Update the last shooting time
+      lastShootTime = millis(); // Opdaterer sidste skydetidspunkt
     }
   }
 }
@@ -94,11 +82,13 @@ function keyReleased() {
   }
 }
 
-
 class Player {
   constructor() {
     this.x = width / 2;
     this.xdir = 0;
+    this.velocity = 0; 
+    this.speed = 1; 
+    this.r = 10;
   }
 
   show() {
@@ -108,55 +98,60 @@ class Player {
   }
 
   setDirection(dir) {
-    this.xdir = dir;
+    this.xdir = dir; 
   }
 
   move() {
-    this.x += this.xdir * 5;
+    this.velocity += this.xdir * this.speed;
+    this.x += this.velocity; 
+    this.velocity *= 0.9; 
+
+    // Constrain player within the canvas
+    this.x = constrain(this.x, this.r, width - this.r);
   }
 }
 
+
 class Invader {
-  constructor(x, y) {
+  constructor(x, y, row) {
     this.x = x;
     this.y = y;
-    this.width = 20; // Width of the invader
-    this.height = 20; // Height of the invader
+    this.r = 20; // Radius for invaderen
+    this.row = row; // Række for invaderen
   }
 
   show() {
-    fill(255, 0, 200);
-    rect(this.x, this.y, this.width, this.height); // Draw invader as a rectangle
+    fill("red");
+    rect(this.x - this.r / 2, this.y - this.r / 2, this.r, this.r);
   }
 
   move(direction) {
-    this.x += direction * this.width; // Move in steps based on its width
+    this.x += direction * 1; // Bevægelse baseret på retning
   }
 
   shiftDown() {
-    this.y += this.height; // Move down by its own height
+    this.y += 20; // Bevægelse nedad
   }
 }
 
+// Kugleklasse
 class Bullet {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.r = 4; // Assuming a radius for the bullet
   }
 
   show() {
     fill(50, 0, 200);
-    ellipse(this.x, this.y, this.r * 2, this.r * 2); // Draw bullet as a circle
+    ellipse(this.x, this.y, 4, 10);
   }
 
   move() {
-    this.y -= 5; // Bullet speed
+    this.y -= 5;
   }
 
   hits(invader) {
-    let hit = this.x > invader.x && this.x < invader.x + invader.width &&
-              this.y > invader.y && this.y < invader.y + invader.height;
-    return hit;
+    let d = dist(this.x, this.y, invader.x, invader.y);
+    return d < 20;
   }
 }
