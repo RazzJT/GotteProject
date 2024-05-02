@@ -46,6 +46,10 @@ function runGame() {
         invaders.splice(i, 1);
         bullets.splice(bullets.indexOf(bullet), 1);
       }
+      if (bullet.y < -10) {
+        bullets.splice (i, 1);
+        console.log("bullet removed");
+      }
     }
   }
 
@@ -166,7 +170,7 @@ class Invader {
   }
 
   move(direction) {
-    this.x += direction * 3; // Bevægelse baseret på retning
+    this.x += direction * 1; // Bevægelse baseret på retning
   }
 
   shiftDown() {
@@ -191,7 +195,7 @@ class Bullet {
   }
 
   hits(invader) {
-    let d = dist(this.x, this.y, invader.x, invader.y);
+    let d = dist(this.x, this.y, invader.x + 10, invader.y - 10);
     return d < 20;
   }
 }
