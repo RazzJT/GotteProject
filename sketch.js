@@ -7,12 +7,15 @@ let score = 0;
 let highScore = 0;
 let invaderSpeed = 1;
 let roundCount = 1; 
-let gold = 0;
-const shootCooldown = 300;
+let gold = 1000;
+let shootCooldown = 590;
 let lastShootTime = 0;
 let restartButton;
 let startGameButton;
 let continueGameButton;
+let upgradeShootSpeed;
+let shootSpeedLevel = 0;
+let upgradeCost = 50;
 const Menu = {
   restart: "restart",
   start: "start",
@@ -39,8 +42,28 @@ function setup() {
   continueGameButton.size(150,50);
   continueGameButton.mouseClicked(newRound);
   continueGameButton.hide()
+
+  upgradeShootSpeed = createButton("Upgrade Shoot Speed: " + shootSpeedLevel);
+  upgradeShootSpeed.position(430,180);
+  upgradeShootSpeed.size(150,50);
+  upgradeShootSpeed.mouseClicked(upgrade);
+  upgradeShootSpeed.hide()
+
   createCanvas(1000, 500);
 }
+
+function upgrade() {
+  if (gold >= upgradeCost) { // Check if the player has enough gold
+    shootSpeedLevel++;
+    shootCooldown = 500 - shootSpeedLevel * 30;
+    upgradeShootSpeed.html("Upgrade Shoot Speed: " + shootSpeedLevel);
+    gold -= upgradeCost; // Deduct the upgrade cost from the player's gold
+    upgradeCost += 25; // Increase the upgrade cost for the next upgrade
+  } else {
+    console.log("Not enough gold!"); // Notify the player if they don't have enough gold
+  }
+}
+
 
 function draw() {
   switch (currentMenu){
@@ -137,7 +160,9 @@ function displayShop() {
   text("Highscore: "  + highScore, 950, 60);
   text("Round: " + roundCount, 100, 30 )
   text("Gold: " + gold, 100, 60)
-  continueGameButton.show()
+  text("Upgrade Cost: " + upgradeCost + " Gold", 400, 210); // Display upgrade cost
+  continueGameButton.show();
+  upgradeShootSpeed.show();
 }
 
 function displayGameOverScreen() {
@@ -186,9 +211,9 @@ function startGame() {
 }
 
 function newRound() {
-  currentMenu = Menu.game
   invaders = [];
   bullets = [];
+  currentMenu = Menu.game
   invaderSpeed = invaderSpeed + 0.2
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
@@ -196,6 +221,7 @@ function newRound() {
     }
   }
   continueGameButton.hide()
+  upgradeShootSpeed.hide()
 }
 
 
