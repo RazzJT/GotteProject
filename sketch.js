@@ -59,6 +59,8 @@ function runGame() {
     for (let i = invaders.length - 1; i >= 0; i--) {
       if (bullet.hits(invaders[i])) {
         score += 10;
+        console.log(invaders)
+        console.log(invaders.length)
         invaders.splice(i, 1);
         bullets.splice(bullets.indexOf(bullet), 1);
       }
@@ -85,6 +87,10 @@ function runGame() {
     }
   }
   
+  if (invaders.length <= 0) {
+    newRound();
+  }
+
 
   // Viser text pg score
   fill(255);
@@ -156,6 +162,7 @@ function newRound() {
   invaders = [];
   bullets = [];
   roundCount++
+  invaderSpeed = invaderSpeed + 0.5
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
       invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
