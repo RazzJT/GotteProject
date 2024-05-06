@@ -273,9 +273,11 @@ class Invader {
   show() {
     fill("red");
     rect(this.x, this.y, this.w, this.w);
-    fill("black")
-    rect(this.x, this.y, 10, 10)
-
+    fill("white")
+     rect(this.x+-5, this.y+-2,5,5)
+    rect(this.x+5, this.y+-2,5,5)
+    fill("white")
+    ellipse(this.x, this.y + 6,15,5)
   }
 
   move(direction) {
