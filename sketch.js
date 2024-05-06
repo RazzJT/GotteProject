@@ -12,6 +12,7 @@ const shootCooldown = 300;
 let lastShootTime = 0;
 let restartButton;
 let startGameButton;
+let continueGameButton;
 const Menu = {
   restart: "restart",
   start: "start",
@@ -33,6 +34,11 @@ function setup() {
   startGameButton.mouseClicked(startGame);
   startGameButton.hide();
 
+  continueGameButton = createButton("Continue?")
+  continueGameButton.position(430,120);
+  continueGameButton.size(150,50);
+  continueGameButton.mouseClicked(newRound);
+  continueGameButton.hide()
   createCanvas(1000, 500);
 }
 
@@ -45,15 +51,6 @@ function draw() {
   }
 }
 
-function displayShop() {
-  fill(255);
-  textSize(20);
-  textAlign(RIGHT);
-  text("Score: " + score, 950, 30);
-  text("Highscore: "  + highScore, 950, 60);
-  text("Round: " + roundCount, 100, 30 )
-  text ("Gold: " + gold, 100, 60)
-}
 
 function runGame() {  
   background(0);
@@ -76,9 +73,8 @@ function runGame() {
         invaders.splice(i, 1);
         bullets.splice(bullets.indexOf(bullet), 1);
         let rng = random([1,2,3,4]);
-        console.log(rng)
         if(rng == 1) {
-          gold += 10
+          gold += 10;
         }
       }
     }
@@ -105,7 +101,8 @@ function runGame() {
   }
   
   if (invaders.length <= 0) {
-    newRound();
+    currentMenu = Menu.shop;
+    roundCount++
   }
 
 
@@ -131,6 +128,17 @@ function displayStartScreen() {
   startGameButton.show();
 }
 
+function displayShop() {
+  background(50);
+  textSize(20);
+  fill(255);
+  textAlign(RIGHT);
+  text("Score: " + score, 950, 30);
+  text("Highscore: "  + highScore, 950, 60);
+  text("Round: " + roundCount, 100, 30 )
+  text("Gold: " + gold, 100, 60)
+  continueGameButton.show()
+}
 
 function displayGameOverScreen() {
   background(50);
@@ -178,15 +186,16 @@ function startGame() {
 }
 
 function newRound() {
+  currentMenu = Menu.game
   invaders = [];
   bullets = [];
-  roundCount++
   invaderSpeed = invaderSpeed + 0.2
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
       invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
     }
   }
+  continueGameButton.hide()
 }
 
 
@@ -238,6 +247,9 @@ class Invader {
   show() {
     fill("red");
     rect(this.x, this.y, this.w, this.w);
+    fill("black")
+    rect(this.x, this.y, 10, 10)
+
   }
 
   move(direction) {
