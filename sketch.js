@@ -5,6 +5,8 @@ let bullets = [];
 let invaderDirection = 1;
 let score = 0;
 let highScore = 0;
+let invaderSpeed = 1;
+let roundCount = 1; 
 
 const shootCooldown = 300;
 let lastShootTime = 0;
@@ -84,11 +86,13 @@ function runGame() {
   }
   
 
-  // Viser scoren
+  // Viser text pg score
   fill(255);
   textSize(20);
   textAlign(RIGHT);
-  text("Score: " + score, width - 20, 30);
+  text("Score: " + score, 950, 30);
+  text("Highscore: "  + highScore, 950, 60);
+  text("Round: " + roundCount, 100, 30 )
 }
 
 function displayStartScreen() {
@@ -141,6 +145,17 @@ function startGame() {
   restartButton.hide();
   startGameButton.hide();
   player = new Player();
+  for (let i = 0; i < 10; i++) {
+    for (let j = 0; j < 5; j++) {
+      invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
+    }
+  }
+}
+
+function newRound() {
+  invaders = [];
+  bullets = [];
+  roundCount++
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
       invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
@@ -202,7 +217,7 @@ class Invader {
   }
 
   move(direction) {
-    this.x += direction * 3; // Bevægelse baseret på retning
+    this.x += direction * invaderSpeed; // Bevægelse baseret på retning
   }
 
   shiftDown() {
