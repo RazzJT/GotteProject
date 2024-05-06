@@ -7,7 +7,7 @@ let score = 0;
 let highScore = 0;
 let invaderSpeed = 1;
 let roundCount = 1; 
-
+let gold = 0;
 const shootCooldown = 300;
 let lastShootTime = 0;
 let restartButton;
@@ -15,7 +15,8 @@ let startGameButton;
 const Menu = {
   restart: "restart",
   start: "start",
-  game: "game"
+  game: "game",
+  shop: "shop"
 }
 let currentMenu = Menu.start;
 
@@ -25,11 +26,13 @@ function setup() {
   restartButton.size(150,50)
   restartButton.mouseClicked(startGame);
   restartButton.hide();
+  
   startGameButton = createButton("Start Game");
   startGameButton.position(430,120);
   startGameButton.size(150,50)
   startGameButton.mouseClicked(startGame);
   startGameButton.hide();
+
   createCanvas(1000, 500);
 }
 
@@ -38,7 +41,18 @@ function draw() {
     case Menu.game: runGame(); break;
     case Menu.start: displayStartScreen(); break;
     case Menu.restart: displayGameOverScreen(); break;
+    case Menu.shop: displayShop(); break;
   }
+}
+
+function displayShop() {
+  fill(255);
+  textSize(20);
+  textAlign(RIGHT);
+  text("Score: " + score, 950, 30);
+  text("Highscore: "  + highScore, 950, 60);
+  text("Round: " + roundCount, 100, 30 )
+  text ("Gold: " + gold, 100, 60)
 }
 
 function runGame() {  
@@ -59,10 +73,13 @@ function runGame() {
     for (let i = invaders.length - 1; i >= 0; i--) {
       if (bullet.hits(invaders[i])) {
         score += 10;
-        console.log(invaders)
-        console.log(invaders.length)
         invaders.splice(i, 1);
         bullets.splice(bullets.indexOf(bullet), 1);
+        let rng = random([1,2,3,4]);
+        console.log(rng)
+        if(rng == 1) {
+          gold += 10
+        }
       }
     }
   }
@@ -99,6 +116,7 @@ function runGame() {
   text("Score: " + score, 950, 30);
   text("Highscore: "  + highScore, 950, 60);
   text("Round: " + roundCount, 100, 30 )
+  text ("Gold: " + gold, 100, 60)
 }
 
 function displayStartScreen() {
@@ -145,6 +163,7 @@ function keyPressed() {
 function startGame() {
   // Reset all variables
   score = 0;
+  roundCount = 1;
   invaders = [];
   bullets = [];
   currentMenu = Menu.game
@@ -162,7 +181,7 @@ function newRound() {
   invaders = [];
   bullets = [];
   roundCount++
-  invaderSpeed = invaderSpeed + 0.5
+  invaderSpeed = invaderSpeed + 0.2
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
       invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
@@ -219,8 +238,6 @@ class Invader {
   show() {
     fill("red");
     rect(this.x, this.y, this.w, this.w);
-    fill("blue")
-    circle(this.x, this.y, this.w)
   }
 
   move(direction) {
