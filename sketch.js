@@ -8,7 +8,7 @@ let highScore = 0;
 let invaderSpeed = 1;
 let roundCount = 1; 
 let gold = 1000;
-let shootCooldown = 590;
+let shootCooldown = 500;
 let lastShootTime = 0;
 let restartButton;
 let startGameButton;
@@ -53,9 +53,9 @@ function setup() {
 }
 
 function upgrade() {
-  if (gold >= upgradeCost) { // Check if the player has enough gold
+  if (gold >= upgradeCost && shootSpeedLevel <= 20) { // Check if the player has enough gold
     shootSpeedLevel++;
-    shootCooldown = 500 - shootSpeedLevel * 30;
+    shootCooldown = 500 - shootSpeedLevel * 25;
     upgradeShootSpeed.html("Upgrade Shoot Speed: " + shootSpeedLevel);
     gold -= upgradeCost; // Deduct the upgrade cost from the player's gold
     upgradeCost += 25; // Increase the upgrade cost for the next upgrade
