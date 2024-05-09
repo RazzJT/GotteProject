@@ -1,30 +1,33 @@
 // Globale variabler
-let player;
-let invaders = [];
-let bullets = [];
-let invaderDirection = 1;
-let score = 0;
-let highScore = 0;
-let invaderSpeed = 1;
-let roundCount = 1; 
-let gold = 1000;
-let shootCooldown = 500;
-let lastShootTime = 0;
-let restartButton;
-let startGameButton;
-let continueGameButton;
-let upgradeShootSpeed;
-let shootSpeedLevel = 0;
-let upgradeCost = 50;
-const Menu = {
+let player; // spillerobjekt
+let invaders = []; // liste af invader objekter
+let bullets = []; // liste af spillerens skud
+let enemyBullets = []; // liste af invaders' skud
+let invaderDirection = 1; // retningen invaders bevæger sig, 1 for højre, -1 for venstre
+let score = 0; // spillerens score
+let highScore = 0; // den højeste score opnået
+let invaderSpeed = 1; // hastigheden af invaders
+let lastEnemyShootTime = 0; // tidspunkt for sidste invaders skud
+let enemyShootInterval = 3000; // interval mellem invaders' skud i millisekunder
+let roundCount = 1; // nuværende runde nummer
+let gold = 0; // spillerens guld
+let shootCooldown = 500; // nedkølingstid mellem skud
+let lastShootTime = 0; // tidspunkt for sidste skud
+let restartButton; // genstart knap
+let startGameButton; // startspil knap
+let continueGameButton; // fortsæt spil knap
+let upgradeShootSpeed; // opgradering for skydehastighed
+let shootSpeedLevel = 0; // niveau af skydehastighedsopgradering
+let upgradeCost = 50; // omkostning ved opgradering
+const Menu = { // menu tilstande
   restart: "restart",
   start: "start",
   game: "game",
   shop: "shop"
 }
-let currentMenu = Menu.start;
+let currentMenu = Menu.start; // nuværende menu
 
-function setup() {
+function setup() { // Opsætning af knapper og canvas
   restartButton = createButton("Restart Game");
   restartButton.position(430,120);
   restartButton.size(150,50)
@@ -52,25 +55,23 @@ function setup() {
   createCanvas(1000, 500);
 }
 
-function upgrade() {
-  if (gold >= upgradeCost && shootSpeedLevel <= 20) { // Check if the player has enough gold
-    shootSpeedLevel++;
-    shootCooldown = 500 - shootSpeedLevel * 25;
+function upgrade() { // Funktion til at opgradere skydehastighed
+  if (gold >= upgradeCost && shootSpeedLevel <= 20) { // Chekker om spilleren har nok guld
+    shootSpeedLevel++; // Øger shoot level variablen med 1
+    shootCooldown = 500 - shootSpeedLevel * 25; // Shoot cooldownen mindskes med 25 pr upgrade
     upgradeShootSpeed.html("Upgrade Shoot Speed: " + shootSpeedLevel);
-    gold -= upgradeCost; // Deduct the upgrade cost from the player's gold
-    upgradeCost += 25; // Increase the upgrade cost for the next upgrade
-  } else {
-    console.log("Not enough gold!"); // Notify the player if they don't have enough gold
+    gold -= upgradeCost; // Fjerner guldet fra player
+    upgradeCost += 25; // Øger prisen på næste opgradering
   }
 }
 
 
-function draw() {
+function draw() { // Styrer spillets hovedlogik baseret på menu tilstand med en switch case
   switch (currentMenu){
-    case Menu.game: runGame(); break;
-    case Menu.start: displayStartScreen(); break;
-    case Menu.restart: displayGameOverScreen(); break;
-    case Menu.shop: displayShop(); break;
+    case Menu.game: runGame(); break; // For selve spillets logik
+    case Menu.start: displayStartScreen(); break; // For startmenuen
+    case Menu.restart: displayGameOverScreen(); break; // For gameover menuen
+    case Menu.shop: displayShop(); break; // For shop menuen mellem runderne
   }
 }
 
@@ -81,6 +82,8 @@ function runGame() {
   player.move();
 
   let edge = false;
+
+  enemyShoot();
 
    for (let bullet of bullets) {
     bullet.show();
@@ -95,14 +98,12 @@ function runGame() {
         score += 10;
         invaders.splice(i, 1);
         bullets.splice(bullets.indexOf(bullet), 1);
-        let rng = random([1,2,3,4]);
-        if(rng == 1) {
+        if(random([1,2,3,4]) == 1) {
           gold += 10;
         }
       }
     }
   }
-
 
   for (let invader of invaders) {
     invader.show();
@@ -113,6 +114,24 @@ function runGame() {
     if (invader.y + invader.w >= height - 30) { // `30` can be adjusted based on where you want the threshold
       currentMenu = Menu.restart 
       highScore = max(highScore, score);
+    }
+  }
+
+  
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    enemyBullets[i].show();
+    enemyBullets[i].move();
+  
+    if (enemyBullets[i].hits(player)) {
+      console.log('Player hit!');
+      currentMenu = Menu.restart; 
+    }
+  
+    if (enemyBullets[i].y > 510) {
+      console.log(enemyBullets);
+      enemyBullets.splice(i, 1);
+      console.log("Enemy bullets removed");
+      console.log(player);
     }
   }
 
@@ -138,6 +157,8 @@ function runGame() {
   text("Round: " + roundCount, 100, 30 )
   text ("Gold: " + gold, 100, 60)
 }
+
+
 
 function displayStartScreen() {
   background(50);
@@ -188,8 +209,17 @@ function keyPressed() {
         lastShootTime = millis();
       }
     }
-  } else if (keyCode === 13) { // Restart game
-    startGame();
+  }
+}
+
+function enemyShoot() {
+  let currentTime = millis();
+  if (currentTime - lastEnemyShootTime > enemyShootInterval) {
+    if (invaders.length > 0) {
+      let shooter = random(invaders); // select a random invader to shoot
+      enemyBullets.push(new EnemyBullet(shooter.x + shooter.w / 2, shooter.y + shooter.w));
+      lastEnemyShootTime = currentTime; // reset the last shoot time
+    }
   }
 }
 
@@ -197,8 +227,11 @@ function startGame() {
   // Reset all variables
   score = 0;
   roundCount = 1;
+  enemyShootInterval = 3000;
+
   invaders = [];
   bullets = [];
+  enemyBullets = [];
   currentMenu = Menu.game
   restartButton.hide();
   startGameButton.hide();
@@ -214,7 +247,8 @@ function newRound() {
   invaders = [];
   bullets = [];
   currentMenu = Menu.game
-  invaderSpeed = invaderSpeed + 0.2
+  invaderSpeed = invaderSpeed + roundCount * 0.2
+  enemyShootInterval = enemyShootInterval - roundCount * 100
   for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 5; j++) {
       invaders.push(new Invader(i * 50 + 50, j * 50 + 20, j + 1));
@@ -235,6 +269,7 @@ function keyReleased() {
 class Player {
   constructor() {
     this.x = width / 2;
+    this.y = 500;
     this.xdir = 0;
     this.velocity = 0; 
     this.speed = 0.7; 
@@ -311,3 +346,25 @@ class Bullet {
   }
 }
 
+// Invader kugleklasse
+class EnemyBullet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.r = 5; // radius of the projectile
+  }
+
+  show() {
+    fill(255, 0, 0); // red color for enemy bullet
+    ellipse(this.x, this.y, this.r * 2, this.r * 2);
+  }
+
+  move() {
+    this.y += 3; // adjust speed as necessary
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x, player.y);
+    return d < 20;  
+  }
+}
