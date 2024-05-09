@@ -268,8 +268,9 @@ function newRound() {
   // Forbereder en ny runde ved at rydde og genopbygge spilarrays
   invaders = [];
   bullets = [];
+  enemyBullets = [];
   currentMenu = Menu.game; // Sætter spilmenuen til aktivt spil
-  invaderSpeed = invaderSpeed + roundCount * 0.2; // Øger invaders' hastighed baseret på runden nummer
+  invaderSpeed = invaderSpeed + roundCount * 0.1; // Øger invaders' hastighed baseret på runden nummer
   enemyShootInterval = enemyShootInterval - roundCount * 100; // Reducerer intervallet mellem invaders' skud
   // Genopbygger invaders-array med nye invader objekter
   for (let i = 0; i < 10; i++) {
@@ -395,4 +396,3 @@ class EnemyBullet {
     return d < 20; // Returnerer true hvis kuglen rammer spilleren
   }
 }
-  
