@@ -8,7 +8,7 @@ let score = 0; // spillerens score
 let highScore = 0; // den højeste score opnået
 let invaderSpeed = 1; // hastigheden af invaders
 let lastEnemyShootTime = 0; // tidspunkt for sidste invaders skud
-let enemyShootInterval = 3000; // interval mellem invaders' skud i millisekunder
+let enemyShootInterval = 1000; // interval mellem invaders' skud i millisekunder
 let roundCount = 1; // nuværende runde nummer
 let gold = 0; // spillerens guld
 let shootCooldown = 500; // nedkølingstid mellem skud
@@ -86,7 +86,10 @@ function runGame() {
   enemyShoot(); // Funktion der håndterer når fjender (invaders) skyder
 
   // Gennemgår hver bullet i spillerens bullets-array
-  for (let bullet of bullets) {
+  for (let i=0; i < bullets.length; i++) {
+    let bullet = bullets[i];
+    
+    
     bullet.show(); // Viser kuglen
     bullet.move(); // Bevæger kuglen
 
@@ -111,7 +114,9 @@ function runGame() {
   }
 
   // Gennemgår hver invader i invaders-arrayet
-  for (let invader of invaders) {
+  for (let i=0; i < invaders.length; i++) {
+    let invader = invaders[i];
+
     invader.show(); // Viser invaderen
     invader.move(invaderDirection); // Bevæger invaderen i den aktuelle retning
     // Tjekker om en invader rører kanten og ændrer retning hvis sandt
@@ -234,12 +239,13 @@ function enemyShoot() {
   if (currentTime - lastEnemyShootTime > enemyShootInterval) { // Tjekker om det er tid til at invaders skal skyde
     if (invaders.length > 0) {
       let shooter = random(invaders); // Vælger en tilfældig invader
-      enemyBullets.push(new EnemyBullet(shooter.x + shooter.w / 2, shooter.y + shooter.w)); // Opretter en ny kugle fra invaderen
+      enemyBullets.push(new EnemyBullet(shooter.x + shooter.w / 2, shooter.y + shooter.w)); // Opretter en ny kugle fra invadere
+
+      
       lastEnemyShootTime = currentTime; // Nulstiller tidspunktet for sidste skud
     }
   }
 }
-
 
 function startGame() {
   // Nulstiller spilvariabler
