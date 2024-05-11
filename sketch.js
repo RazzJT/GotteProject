@@ -55,16 +55,6 @@ function setup() { // Opsætning af knapper og canvas
   createCanvas(1000, 500);
 }
 
-function upgrade() { // Funktion til at opgradere skydehastighed
-  if (gold >= upgradeCost && shootSpeedLevel <= 20) { // Chekker om spilleren har nok guld
-    shootSpeedLevel++; // Øger shoot level variablen med 1
-    shootCooldown = 500 - shootSpeedLevel * 25; // Shoot cooldownen mindskes med 25 pr upgrade
-    upgradeShootSpeed.html("Upgrade Shoot Speed: " + shootSpeedLevel);
-    gold -= upgradeCost; // Fjerner guldet fra player
-    upgradeCost += 25; // Øger prisen på næste opgradering
-  }
-}
-
 
 function draw() { // Styrer spillets hovedlogik baseret på menu tilstand med en switch case
   switch (currentMenu){
@@ -151,8 +141,7 @@ function runGame() {
   if (edge) {
     invaderDirection *= -1;
     for (let i=0; i < invaders.length; i++) {
-      let invader = invaders[i]; 
-      invader.shiftDown();
+      invaders[i].shiftDown();
     }
   }
   
@@ -161,9 +150,6 @@ function runGame() {
     currentMenu = Menu.shop;
     roundCount++;
   }
-
-
-
 
   // Viser text pg score
   fill(255);
@@ -204,6 +190,15 @@ function displayShop() {
   upgradeShootSpeed.show(); // Viser knappen for at opgradere skudhastighed
 }
 
+function upgrade() { // Funktion til at opgradere skydehastighed
+  if (gold >= upgradeCost && shootSpeedLevel <= 20) { // Chekker om spilleren har nok guld
+    shootSpeedLevel++; // Øger shoot level variablen med 1
+    shootCooldown = 500 - shootSpeedLevel * 25; // Shoot cooldownen mindskes med 25 pr upgrade
+    upgradeShootSpeed.html("Upgrade Shoot Speed: " + shootSpeedLevel);
+    gold -= upgradeCost; // Fjerner guldet fra player
+    upgradeCost += 25; // Øger prisen på næste opgradering
+  }
+}
 
 function displayGameOverScreen() {
   background(50); // Sætter baggrundsfarven til en mørkegrå
