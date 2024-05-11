@@ -130,7 +130,6 @@ function runGame() {
 
   // Gennemgår hver fjende kugle i enemyBullets-arrayet
   for (let i = enemyBullets.length - 1; i >= 0; i--) {
-    enemyBullets[i]; 
 
     enemyBullets[i].show(); // Viser kuglen
     enemyBullets[i].move(); // Bevæger kuglen
@@ -151,7 +150,8 @@ function runGame() {
   // Ændrer retning af alle invaders og flytter dem nedad hvis en rører kanten
   if (edge) {
     invaderDirection *= -1;
-    for (let invader of invaders) {
+    for (let i=0; i < invaders.length; i++) {
+      let invader = invaders[i]; 
       invader.shiftDown();
     }
   }
