@@ -88,8 +88,6 @@ function runGame() {
   // Gennemgår hver bullet i spillerens bullets-array
   for (let i=0; i < bullets.length; i++) {
     let bullet = bullets[i];
-    
-    
     bullet.show(); // Viser kuglen
     bullet.move(); // Bevæger kuglen
 
@@ -132,6 +130,8 @@ function runGame() {
 
   // Gennemgår hver fjende kugle i enemyBullets-arrayet
   for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    enemyBullets[i]; 
+
     enemyBullets[i].show(); // Viser kuglen
     enemyBullets[i].move(); // Bevæger kuglen
 
@@ -139,6 +139,7 @@ function runGame() {
     if (enemyBullets[i].hits(player)) {
       console.log('Player hit!');
       currentMenu = Menu.restart;
+      highScore = max(highScore, score); // Opdaterer highscore hvis nødvendigt
     }
 
     // Fjerner kuglen hvis den går uden for bunden af skærmen
